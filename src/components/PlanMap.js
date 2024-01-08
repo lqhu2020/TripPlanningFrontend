@@ -28,7 +28,7 @@ function PlanMap() {
     const opt = {
       method: "GET",
       // url: PROXY_URL + posturl,
-      url: `https://cors-anywhere.herokuapp.com/http://34.82.85.194:8080/showDefaultPlaces?max_num_display=${numPlaces}`,
+      url: BASE_URL,
       // data: {
       //   max_num_display: 3,
       // },
