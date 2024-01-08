@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { differenceInDays } from "date-fns";
+import { Space, message } from "antd";
 
 const today = new Date();
 
@@ -31,28 +32,41 @@ function DateInput() {
 
   return (
     <div>
-      {days < 14 ? (
-        <p> if selected dates are correct, please comfirm the selection !</p>
+      {!dateInput.endDate ? (
+        <p>Please select dates</p>
+      ) : days >= 14 ? (
+        <p style={{ color: "red" }}> no more than 15 days </p>
       ) : (
-        <p> Please select dates, no more than 15 days</p>
+        <p style={{ color: "green" }}>if dates are correct, please comfirm !</p>
       )}
-
-      <DatePicker
-        selectsStart
-        selected={dateInput.startDate}
-        onChange={(date) => handleDateChange("startDate", date)}
-        startDate={dateInput.startDate}
-        minDate={today}
-      />
-      <DatePicker
-        selectsEnd
-        selected={dateInput.endDate}
-        onChange={(date) => handleDateChange("endDate", date)}
-        endDate={dateInput.endDate}
-        startDate={dateInput.startDate}
-        minDate={today}
-      />
-      <button onClick={() => setNumOfDays(days + 2)}>Confirm</button>
+      <Space direction="horizontal" size={12}>
+        Start Date
+        <DatePicker
+          selectsStart
+          selected={dateInput.startDate}
+          onChange={(date) => handleDateChange("startDate", date)}
+          startDate={dateInput.startDate}
+          minDate={today}
+        />
+        End Date
+        <DatePicker
+          selectsEnd
+          selected={dateInput.endDate}
+          onChange={(date) => handleDateChange("endDate", date)}
+          endDate={dateInput.endDate}
+          startDate={dateInput.startDate}
+          minDate={today}
+        />
+        <button
+          disabled={days >= 14 || !dateInput.endDate}
+          onClick={() => {
+            setNumOfDays(days + 2);
+            message.success("Dates are confirmed !");
+          }}
+        >
+          Confirm
+        </button>
+      </Space>
     </div>
   );
 }

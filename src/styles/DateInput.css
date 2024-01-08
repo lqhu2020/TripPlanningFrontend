@@ -1,0 +1,11 @@
+.date-form {
+  /* max-width: 400px; */
+  width: 300px;
+  /* width:60%; */
+  margin: 0 auto;
+}
+
+.date-form-confirm-button {
+  width: 300px;
+  /* width:60%; */
+}
