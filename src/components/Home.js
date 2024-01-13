@@ -7,7 +7,6 @@ import CreatePlanButton from "./CreatePlanButton";
 // import PhotoGallery from "./PhotoGallery";
 import PlanGallery from "./PlanGallery";
 import { UNSPLASH_ROOT, UNSPLASH_KEY } from "../constants";
-import Img from "../assets/images/Beijing.jpeg";
 const { TabPane } = Tabs;
 
 function Home(props) {
