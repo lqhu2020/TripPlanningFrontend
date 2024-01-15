@@ -1,22 +1,43 @@
 import { Button, Space } from "antd";
 import React from "react";
 import { Link } from "react-router-dom";
+import DisplayPlanMap from "./DisplayPlanMap";
+import DisplayPlanTabs from "./DisplayPlanTabs";
+
 
 function DisplayPlan() {
-  console.log("display plan");
-
   const addToSavedPlans = () => {
-    console.log("plan added!")
-  }
+    console.log("plan added!");
+  };
+
+  const homeButtonStyle = {
+    position: "absolute",
+    right: "0",
+    padding: "40px",
+  };
+
+  const editButtonStyle = {
+    paddingTop: "10vh",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  };
 
   return (
-    <div>
-      <div>
+    <div style={{ padding: "20px" }}>
+      <div style={homeButtonStyle}>
         <Link to="/Home">
           <Button>Home</Button>
         </Link>
       </div>
-      <Space>
+      <h1>Plan 1</h1>
+      <div style={{ display: "flex", width: "100%" }}>
+        <DisplayPlanMap />
+        <div style={{ paddingLeft: "10vw" }}>
+          <DisplayPlanTabs />
+        </div>
+      </div>
+      <Space style={editButtonStyle}>
         <span>
           <Link to="/AddPlan">
             <Button onClick={addToSavedPlans}>Edit Plans</Button>
