@@ -5,6 +5,8 @@
 @import "./styles/Register.css";
 @import "./styles/Home.css";
 @import "./styles/PlanMap.css";
+@import "./styles/AddPlan.css";
+@import "./styles/Overlay.css";
 
 body {
   margin: 0;

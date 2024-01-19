@@ -1,11 +1,21 @@
 import { Button, Space } from "antd";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import DisplayPlanMap from "./DisplayPlanMap";
 import DisplayPlanTabs from "./DisplayPlanTabs";
 
-
 function DisplayPlan() {
+  const [generatedTrips, setGeneratedTrips] = useState();
+
+  useEffect(() => {
+    const tempTrips = JSON.parse(localStorage.getItem("trips"));
+    if (tempTrips) {
+      setGeneratedTrips(tempTrips);
+    }
+  }, []);
+
+  console.log(generatedTrips);
+
   const addToSavedPlans = () => {
     console.log("plan added!");
   };

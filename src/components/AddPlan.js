@@ -1,19 +1,238 @@
-import React, { useState } from "react";
-import moment from "moment";
+/* global google */
+
+import React, { useEffect, useState, createRef } from "react";
 import { Link } from "react-router-dom";
 import DateInput from "./DateInput";
 import PlanMap from "./PlanMap";
+import PlaceList from "./PlaceList";
+import { Grid } from "@material-ui/core";
+import { differenceInDays } from "date-fns";
+import { PLACES, GOOGLE_MAP_API_KEY } from "../constants.js";
+import PlaceMenu from "./PlaceMenu.js";
+
+import { Typography, Divider, message } from "antd";
 
 function AddPlan() {
+  const { Title } = Typography;
+
+  //========== for date
+  const [dateInput, setDateInput] = useState({
+    startDate: null,
+    endDate: null,
+  });
+  const [numOfDays, setNumOfDays] = useState(0);
+
+  function handleDateChange(dateIdentifier, newDate) {
+    setDateInput((prevDate) => {
+      return {
+        ...prevDate,
+        [dateIdentifier]: newDate,
+      };
+    });
+  }
+
+  const days = differenceInDays(dateInput.endDate, dateInput.startDate);
+  if (days >= 14) {
+    message.warning("no more than 15 days");
+  }
+  console.log(numOfDays);
+
+  //========== fetch default places
+  const [placeArr, setPlaceArr] = useState([]);
+
+  useEffect(() => {
+    formatPlaces(PLACES);
+  }, [PLACES]);
+
+  const formatPlaces = (places) => {
+    if (!places || places.length === 0) {
+      return <div>No Data!</div>;
+    }
+
+    const placeArr = places.map((p) => {
+      return {
+        id: p.id,
+        name: p.DisplayName.text,
+        address: p.formattedAddress,
+        latitude: p.location.latitude,
+        longitude: p.location.longitude,
+        reviews: p.reviews,
+        // to add photos
+        photoUrl:
+          "https://places.googleapis.com/v1/" +
+          p.photos[0].name +
+          "/media?maxHeightPx=400&maxWidthPx=400&key=" +
+          GOOGLE_MAP_API_KEY,
+        original: p,
+      };
+    });
+    setPlaceArr(placeArr);
+  };
+
+  const [placeClicked, setPlaceClicked] = useState();
+
+  // console.log(placeClicked);
+
+  const [elRefs, setElRefs] = useState([]);
+  useEffect(() => {
+    setElRefs((refs) =>
+      Array(placeArr.length)
+        .fill()
+        .map((_, i) => refs[i] || createRef())
+    );
+  }, [placeArr]);
+
+  //========== add places to each day
+
+  const [trips, setTrips] = useState(new Array(0));
+
+  function initializeTrips() {
+    setTrips(new Array(0));
+    for (let i = 0; i < numOfDays; i++) {
+      setTrips((trips) => [...trips, new Array(0)]);
+    }
+    // console.log(typeof trips);
+    // console.log(Array.isArray(trips));
+  }
+
+  useEffect(() => {
+    if (numOfDays > 0) {
+      initializeTrips();
+    }
+  }, [numOfDays]);
+
+  function addOnePlace(idx, pname) {
+    let newTrips = [...trips];
+    newTrips[idx] = [...newTrips[idx], pname];
+    setTrips(newTrips);
+  }
+
+  function deleteOnePlace(dateIndex, pname) {
+    let newTrips = [...trips];
+
+    newTrips[dateIndex] = newTrips[dateIndex].filter((v, i) => v.name != pname);
+    setTrips(newTrips);
+    // console.log("newTrips after delete is");
+    // console.log(newTrips);
+    // console.log("Trips after delete is");
+    // console.log(trips);
+  }
+
+  console.log("trips in addplan is");
+  console.log(trips);
+
+  //========== delete places to each day
+
+  const [openList, setOpenList] = useState([]);
+  const num = trips.length;
+
+  useEffect(() => {
+    const newList = [];
+    for (let i = 0; i < num; i++) {
+      newList.push(false);
+    }
+    setOpenList(newList);
+  }, [num]);
+
+  function handleClick(index) {
+    let temp = [...openList];
+    temp[index] = temp[index] === true ? false : true;
+    console.log("a");
+    setOpenList(temp);
+  }
+
+  // console.log("openlist:");
+  // console.log(openList);
+
+  //========== generate trip object
+
+  function handleConfirmPlaces() {
+    // formate trips with original place object
+    const tripList = trips.map((trip, i) => {
+      return trip.map((t, j) => {
+        return t.original;
+      });
+    });
+
+    // for (let i = 0; i < tripList.length; i++) {
+    //   localStorage.setItem(`trips${0}`, JSON.stringify(tripList[0]));
+    // }
+    localStorage.setItem(`trips`, JSON.stringify(tripList));
+  }
+
   return (
-    <div>
-      <p>This is AddPlan page</p>
-      <DateInput />
-      <PlanMap />
-      <Link to="/DisplayPlan">
-        <button>DisplayPlan</button>
-      </Link>
-    </div>
+    <>
+      <Title level={5}>Choose Your Plan Date </Title>
+      <DateInput dateInput={dateInput} handleDateChange={handleDateChange}>
+        <button
+          disabled={days >= 14 || !dateInput.endDate}
+          onClick={() => {
+            setNumOfDays(days + 1);
+            message.success("Dates are confirmed! Explore New Your City");
+          }}
+        >
+          Confirm Dates
+        </button>
+        <Divider></Divider>
+      </DateInput>
+
+      {numOfDays <= 15 && numOfDays > 0 ? (
+        <>
+          <Title level={5}>Choose Your Places You Want To Visit </Title>
+          <Grid
+            container
+            spacing={3}
+            style={{ width: "100%" }}
+            direction="row"
+            justifyContent="center"
+            alignItems="flex-start"
+          >
+            <Grid item xs={12} md={8}>
+              <PlanMap placeArr={placeArr} setPlaceClicked={setPlaceClicked} />
+            </Grid>
+            <Grid item xs={12} md={2}>
+              <PlaceList
+                placeArr={placeArr}
+                placeClicked={placeClicked}
+                elRefs={elRefs}
+                dateInput={dateInput}
+                numOfDays={numOfDays}
+                addOnePlace={addOnePlace}
+              />
+            </Grid>
+            {Array.isArray(trips) && (
+              <Grid
+                container
+                xs={12}
+                md={2}
+                display="flex"
+                justifyContent="space-between"
+                direction="column"
+              >
+                <Grid item xs={12} md={12}>
+                  <PlaceMenu
+                    trips={trips}
+                    deleteOnePlace={deleteOnePlace}
+                    openList={openList}
+                    handleClick={handleClick}
+                  />
+                </Grid>
+
+                <Divider></Divider>
+                <Grid item>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <Link to="/displayplan">
+                    <button onClick={handleConfirmPlaces}>
+                      Confirm Places
+                    </button>
+                  </Link>
+                </Grid>
+              </Grid>
+            )}
+          </Grid>
+        </>
+      ) : null}
+    </>
   );
 }
 
