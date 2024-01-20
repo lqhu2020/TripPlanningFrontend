@@ -1,5 +1,7 @@
+/*global google*/
 import React, { useState } from "react";
 import { Radio, Tabs } from "antd";
+
 const DisplayPlanTabs = () => {
   const [mode, setMode] = useState("top");
 
@@ -25,7 +27,7 @@ const DisplayPlanTabs = () => {
         <Radio.Button value="left">Vertical</Radio.Button> */}
       </Radio.Group>
       <Tabs
-        defaultActiveKey="1"
+        defaultActiveKey="0"
         tabPosition={mode}
         style={{
           height: 220,

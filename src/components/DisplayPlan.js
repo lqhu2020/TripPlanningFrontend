@@ -1,8 +1,11 @@
+/*global google*/
 import { Button, Space } from "antd";
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import DisplayPlanMap from "./DisplayPlanMap";
 import DisplayPlanTabs from "./DisplayPlanTabs";
+import { useLoadScript } from "@react-google-maps/api";
+import { GOOGLE_MAP_API_KEY } from "../constants";
 
 function DisplayPlan() {
   const [generatedTrips, setGeneratedTrips] = useState();
@@ -33,6 +36,10 @@ function DisplayPlan() {
     alignItems: "center",
   };
 
+  const isLoaded = useLoadScript({
+    googleMapsApiKey: GOOGLE_MAP_API_KEY,
+  });
+
   return (
     <div style={{ padding: "20px" }}>
       <div style={homeButtonStyle}>
@@ -42,7 +49,7 @@ function DisplayPlan() {
       </div>
       <h1>Plan 1</h1>
       <div style={{ display: "flex", width: "100%" }}>
-        <DisplayPlanMap />
+        {<DisplayPlanMap></DisplayPlanMap>}
         <div style={{ paddingLeft: "10vw" }}>
           <DisplayPlanTabs />
         </div>

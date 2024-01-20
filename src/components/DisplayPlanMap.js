@@ -1,14 +1,17 @@
-// src/DirectionMap.js
-import React from "react";
+/*global google*/
+import React, { useState } from "react";
 import {
   useLoadScript,
   GoogleMap,
-  DirectionsService,
+  DirectionsRenderer,
 } from "@react-google-maps/api";
 import { CENTER_CITY } from "../constants";
 import { GOOGLE_MAP_API_KEY } from "../constants";
+import { Button } from "antd";
 
-const DisplayPlanMap = ({ waypoints }) => {
+const google = window.google;
+
+function DisplayPlanMap() {
   const mapContainerStyle = {
     height: "60vh",
     width: "40vw",
@@ -18,18 +21,44 @@ const DisplayPlanMap = ({ waypoints }) => {
     googleMapsApiKey: GOOGLE_MAP_API_KEY,
   });
 
-  const directionsCallback = (response) => {
-    if (response !== null && response.status === "OK") {
-      // Handle the directions response here
-      console.log(response);
-    } else {
-      // Handle errors
-      console.error("Error fetching directions:", response);
-    }
+  const [directions, setDirections] = useState();
+
+  const waypts = [
+    {
+      location: "JFK Airport",
+      stopover: true,
+    },
+    {
+      location: "Radiocity Music Hall",
+      stopover: true,
+    },
+  ];
+
+  const fetchDirections = () => {
+    const service = new google.maps.DirectionsService();
+    service.route(
+      {
+        origin: "Tenement Museum",
+        destination: "Central park",
+        waypoints: waypts,
+        optimizeWaypoints: true,
+        travelMode: "DRIVING",
+      },
+      (result, status) => {
+        if (status === "OK" && result) {
+          setDirections(result);
+          console.log(status);
+          console.log(result);
+        } else {
+          console.error(`error fetching directions ${result}`);
+        }
+      }
+    );
   };
 
   return (
     <div>
+      <Button onClick={fetchDirections}> Display Directions</Button>
       {!isLoaded ? (
         <h1>Loading...</h1>
       ) : (
@@ -38,18 +67,13 @@ const DisplayPlanMap = ({ waypoints }) => {
           center={CENTER_CITY}
           zoom={10}
         >
-          <DirectionsService
-            options={{
-              destination: "40.644625, -73.779703",
-              origin: CENTER_CITY,
-              travelMode: "DRIVING",
-            }}
-            callback={directionsCallback}
-          />
+          {directions && (
+            <DirectionsRenderer directions={directions}></DirectionsRenderer>
+          )}
         </GoogleMap>
       )}
     </div>
   );
-};
+}
 
 export default DisplayPlanMap;
