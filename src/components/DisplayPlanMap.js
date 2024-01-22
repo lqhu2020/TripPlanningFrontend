@@ -10,7 +10,7 @@ import { CENTER_CITY } from "../constants";
 import { GOOGLE_MAP_API_KEY } from "../constants";
 import { Button } from "antd";
 
-const google = window.google;
+// const google = window.google;
 
 function DisplayPlanMap({ trip }) {
   const mapContainerStyle = {
@@ -55,6 +55,7 @@ function DisplayPlanMap({ trip }) {
       setWaypts([]);
     }
 
+    console.log("waypts");
     console.log(waypts);
 
     const service = new google.maps.DirectionsService();
