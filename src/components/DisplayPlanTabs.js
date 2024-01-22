@@ -1,48 +1,66 @@
 /*global google*/
 import React, { useState } from "react";
-import { Radio, Tabs } from "antd";
+import PropTypes from "prop-types";
+import { makeStyles } from "@material-ui/core/styles";
+import {
+  withStyles,
+  AppBar,
+  Tabs,
+  Tab,
+  Grid,
+  Button,
+  Typography,
+  Box,
+} from "@material-ui/core";
+import Paper from "@mui/material/Paper";
 
-const DisplayPlanTabs = () => {
-  const [mode, setMode] = useState("top");
+const DisplayPlanTabs = ({ trips, tabKey, handleTabChange }) => {
+  function renderDayTrip(trip) {
+    let result = "";
 
-  const handleModeChange = (e) => {
-    setMode(e.target.value);
-  };
+    for (let i = 0; i < trip.length; i++) {
+      result =
+        result +
+        " (" +
+        (i + 1) +
+        ") " +
+        trip[i].name +
+        " (" +
+        trip[i].address +
+        ") " +
+        "\n";
+    }
 
-  const tapStyle = {
-    height: "40vh",
-    width: "40vw",
-  };
+    return <p>{result}</p>;
+  }
+
+  // const [value, setValue] = useState(0);
+
+  // const handleChange = (event, newValue) => {
+  //   setValue(newValue);
+  // };
 
   return (
-    <div style={tapStyle}>
-      <Radio.Group
-        onChange={handleModeChange}
-        value={mode}
-        style={{
-          marginBottom: 8,
-        }}
-      >
-        {/* <Radio.Button value="top">Horizontal</Radio.Button>
-        <Radio.Button value="left">Vertical</Radio.Button> */}
-      </Radio.Group>
+    <div>
       <Tabs
-        defaultActiveKey="0"
-        tabPosition={mode}
-        style={{
-          height: 220,
-        }}
-        items={new Array(15).fill(null).map((_, i) => {
-          const id = String(i);
-          return {
-            label: `Day ${i + 1}`,
-            key: id,
-            disabled: i === 28,
-            children: `Destinations of day ${i + 1}`,
-          };
-        })}
-      />
+        value={tabKey}
+        onChange={handleTabChange}
+        indicatorColor="primary"
+        textColor="primary"
+        variant="scrollable"
+        scrollButtons="auto"
+      >
+        {trips.map((trip, i) => (
+          <Tab key={i} value={i} label={`day ${i + 1}`} className="mytab" />
+        ))}
+      </Tabs>
+      <Paper>
+        {trips[tabKey]?.map((t, j) => (
+          <li>{t.name + ", Address: " + t.address}</li>
+        ))}
+      </Paper>
     </div>
   );
 };
+
 export default DisplayPlanTabs;

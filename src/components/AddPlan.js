@@ -120,6 +120,7 @@ function AddPlan() {
 
   console.log("trips in addplan is");
   console.log(trips);
+  console.log(typeof trips);
 
   //========== delete places to each day
 
@@ -143,21 +144,30 @@ function AddPlan() {
 
   // console.log("openlist:");
   // console.log(openList);
+  // console.log(typeof trips);
+  // console.log(Array.isArray(trips));
 
   //========== generate trip object
 
   function handleConfirmPlaces() {
     // formate trips with original place object
+
     const tripList = trips.map((trip, i) => {
       return trip.map((t, j) => {
         return t.original;
       });
     });
 
+    // to generate object
+
     // for (let i = 0; i < tripList.length; i++) {
     //   localStorage.setItem(`trips${0}`, JSON.stringify(tripList[0]));
     // }
-    localStorage.setItem(`trips`, JSON.stringify(tripList));
+    // localStorage.setItem(`trips`, JSON.stringify(tripList));
+
+    // localStorage.setItem(`fTrips`, JSON.stringify(tripList));
+    // localStorage.setItem("startDate", JSON.stringify(dateInput.startDate));
+    // localStorage.setItem("endDate", JSON.stringify(dateInput.endDate));
   }
 
   return (
@@ -221,10 +231,20 @@ function AddPlan() {
                 <Divider></Divider>
                 <Grid item>
                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  <Link to="/displayplan">
-                    <button onClick={handleConfirmPlaces}>
-                      Confirm Places
-                    </button>
+                  <Link
+                    to={{
+                      pathname: "/displayplan",
+                      state: { trips: trips },
+                    }}
+                  >
+                    {" "}
+                    Confirm to Generate Plan
+                    {/* <button onClick={handleConfirmPlaces}>
+                      Confirm to Generate Plan
+                    </button> */}
+                    {/* <button>
+                      Confirm to Generate Plan
+                    </button> */}
                   </Link>
                 </Grid>
               </Grid>
