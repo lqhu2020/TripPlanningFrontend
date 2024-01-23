@@ -58,9 +58,9 @@ function DisplayPlan(props) {
     alignItems: "center",
   };
 
-  const isLoaded = useLoadScript({
-    googleMapsApiKey: GOOGLE_MAP_API_KEY,
-  });
+  // const isLoaded = useLoadScript({
+  //   googleMapsApiKey: GOOGLE_MAP_API_KEY,
+  // });
 
   // to set the active tab;
   // const [activeTab, setActiveTab] = useState(0);

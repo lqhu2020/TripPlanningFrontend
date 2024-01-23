@@ -24,6 +24,14 @@ function DisplayPlanMap({ trip }) {
     googleMapsApiKey: GOOGLE_MAP_API_KEY,
   });
 
+  const onMapLoad = (map) => {
+    // setMapRef(map);
+    const bounds = new google.maps.LatLngBounds();
+    trip?.forEach(({ latitude, longitude }) =>
+      bounds.extend({ lat: latitude, lng: longitude })
+    );
+    map.fitBounds(bounds);
+  };
   const [directions, setDirections] = useState();
   const [waypts, setWaypts] = useState([]);
   const [startPlace, setStartPlace] = useState();
@@ -36,47 +44,49 @@ function DisplayPlanMap({ trip }) {
   useEffect(() => {
     setTmpTrip(trip);
 
-    console.log("effect");
-    // console.log(typeof trip[0].name);
-    const tmp1 = tmpTrip.at(0).name;
-    const tmp2 = tmpTrip.at(tmpTrip.length - 1).name;
-    setStartPlace(tmp1);
-    setEndPlace(tmp2);
-
-    console.log(startPlace);
-    console.log(endPlace);
-
-    if (tmpTrip.length >= 3) {
+    if (tmpTrip.length >= 2) {
       // const tmp = tmpTrip.slice(1, -1);
+      console.log("effect");
+      // console.log(typeof trip[0].name);
+      const tmp1 = tmpTrip.at(0).name;
+      const tmp2 = tmpTrip.at(tmpTrip.length - 1).name;
+      setStartPlace(tmp1);
+      setEndPlace(tmp2);
+
+      console.log(startPlace);
+      console.log(endPlace);
 
       const alist = tmpTrip.map((p, i) => ({ location: p.name })).slice(1, -1);
       setWaypts(alist);
+
+      const service = new google.maps.DirectionsService();
+      service.route(
+        {
+          origin: startPlace,
+          destination: endPlace,
+          waypoints: waypts,
+          optimizeWaypoints: true,
+          travelMode: "DRIVING",
+        },
+        (result, status) => {
+          if (status === "OK" && result) {
+            setDirections(result);
+            console.log(status);
+            console.log(result);
+          } else {
+            console.error(`error fetching directions ${result}`);
+          }
+        }
+      );
     } else {
       setWaypts([]);
+      setStartPlace();
+      setEndPlace();
+      setDirections();
     }
 
     console.log("waypts");
     console.log(waypts);
-
-    const service = new google.maps.DirectionsService();
-    service.route(
-      {
-        origin: startPlace,
-        destination: endPlace,
-        waypoints: waypts,
-        optimizeWaypoints: true,
-        travelMode: "DRIVING",
-      },
-      (result, status) => {
-        if (status === "OK" && result) {
-          setDirections(result);
-          console.log(status);
-          console.log(result);
-        } else {
-          console.error(`error fetching directions ${result}`);
-        }
-      }
-    );
   }, [trip]);
 
   return (
@@ -86,16 +96,17 @@ function DisplayPlanMap({ trip }) {
       ) : (
         <GoogleMap
           mapContainerStyle={mapContainerStyle}
-          center={CENTER_CITY}
-          zoom={10}
+          // center={CENTER_CITY}
+          // zoom={10}
+          onLoad={onMapLoad}
         >
-          {trip.length <= 1
-            ? trip.map((p, index) => (
-                <Marker
-                  position={{ lat: p.latitude, lng: p.longitude }}
-                ></Marker>
-              ))
-            : directions && <DirectionsRenderer directions={directions} />}
+          {trip.length <= 1 ? (
+            trip.map((p, index) => (
+              <Marker position={{ lat: p.latitude, lng: p.longitude }}></Marker>
+            ))
+          ) : (
+            <DirectionsRenderer directions={directions} />
+          )}
         </GoogleMap>
       )}
     </div>
