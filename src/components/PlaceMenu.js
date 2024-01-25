@@ -24,11 +24,11 @@ function PlaceMenu({ trips, deleteOnePlace, openList, handleClick }) {
             <ListItemButton
               onClick={() => {
                 handleClick(i);
-                console.log("click tab");
+                // console.log("click tab");
               }}
               key={i}
             >
-              <ListItemText primary={`Day ${i + 1}`} />
+              <ListItemText primary={`Day ${i + 1} (click to select this day)`} />
               {openList[i] ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
             <Collapse in={openList[i]} timeout="auto" unmountOnExit>

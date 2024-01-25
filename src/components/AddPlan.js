@@ -1,4 +1,5 @@
 /* global google */
+import axios from "axios";
 
 import React, { useEffect, useState, createRef } from "react";
 import { Link } from "react-router-dom";
@@ -7,13 +8,14 @@ import PlanMap from "./PlanMap";
 import PlaceList from "./PlaceList";
 import { Grid } from "@material-ui/core";
 import { differenceInDays } from "date-fns";
-import { PLACES, GOOGLE_MAP_API_KEY } from "../constants.js";
+import { PLACES, GOOGLE_MAP_API_KEY, BACKEND } from "../constants.js";
 import PlaceMenu from "./PlaceMenu.js";
 
-import { Typography, Divider, message } from "antd";
+import { Typography, Divider, message, Input} from "antd";
 
 function AddPlan() {
   const { Title } = Typography;
+  const { Search } = Input
 
   //========== for date
   const [dateInput, setDateInput] = useState({
@@ -39,6 +41,8 @@ function AddPlan() {
 
   //========== fetch default places
   const [placeArr, setPlaceArr] = useState([]);
+  const [placeIsLoading, setPlaceIsLoading] = useState(false)
+  const [searchValue, setSearchValue] = useState("");
 
   useEffect(() => {
     formatPlaces(PLACES);
@@ -71,6 +75,31 @@ function AddPlan() {
 
   const [placeClicked, setPlaceClicked] = useState();
 
+  const onSearch = async (user_input) => {
+    // Clear the search input
+    setSearchValue("");
+    setPlaceIsLoading(true);
+
+    // get the searched places by calling backend api
+    try {
+        const response = await axios.get(`${BACKEND}/searchPlaces`, {
+            params: {
+                max_num_display: 100,
+                user_input
+            }
+        });
+        console.log(response.data)
+        formatPlaces(response.data)
+        
+      } catch (error) {
+        console.error(`Error: ${error}`);
+        
+      } finally {
+        setPlaceIsLoading(false);
+      }
+    // update the places to show
+
+  }
   // console.log(placeClicked);
 
   const [elRefs, setElRefs] = useState([]);
@@ -118,9 +147,9 @@ function AddPlan() {
     // console.log(trips);
   }
 
-  console.log("trips in addplan is");
-  console.log(trips);
-  console.log(typeof trips);
+//   console.log("trips in addplan is");
+//   console.log(trips);
+//   console.log(typeof trips);
 
   //========== delete places to each day
 
@@ -135,10 +164,10 @@ function AddPlan() {
     setOpenList(newList);
   }, [num]);
 
-  function handleClick(index) {
+  function handleClickDay(index) {
     let temp = [...openList];
     temp[index] = temp[index] === true ? false : true;
-    console.log("a");
+    // console.log("a");
     setOpenList(temp);
   }
 
@@ -172,6 +201,7 @@ function AddPlan() {
 
   return (
     <>
+    
       <Title level={5}>Choose Your Plan Date </Title>
       <DateInput dateInput={dateInput} handleDateChange={handleDateChange}>
         <button
@@ -187,7 +217,20 @@ function AddPlan() {
       </DateInput>
 
       {numOfDays <= 15 && numOfDays > 0 ? (
+        
         <>
+          <div>
+                <Search
+                placeholder="search for places"
+                // enterButton="Ask"
+                size="large"
+                onSearch={onSearch}
+                // loading={isLoading}
+                value={searchValue} // Control the value
+                onChange={(e)=>{ setSearchValue(e.target.value);}} // Update the value when changed
+                />
+          </div>
+
           <Title level={5}>Choose Your Places You Want To Visit </Title>
           <Grid
             container
@@ -202,6 +245,7 @@ function AddPlan() {
             </Grid>
             <Grid item xs={12} md={2}>
               <PlaceList
+                isLoading={placeIsLoading}
                 placeArr={placeArr}
                 placeClicked={placeClicked}
                 elRefs={elRefs}
@@ -224,7 +268,7 @@ function AddPlan() {
                     trips={trips}
                     deleteOnePlace={deleteOnePlace}
                     openList={openList}
-                    handleClick={handleClick}
+                    handleClick={handleClickDay}
                   />
                 </Grid>
 

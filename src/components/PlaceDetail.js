@@ -78,6 +78,12 @@ function PlaceDetail({
             minDate={dateInput.startDate}
             maxDate={dateInput.endDate}
           />
+          <div>
+            <button
+                onClick={closeOverlay}> ok
+            </button>
+          </div>
+          
         </Overlay>
       </CardActions>
     </Card>

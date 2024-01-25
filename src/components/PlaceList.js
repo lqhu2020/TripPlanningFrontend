@@ -1,4 +1,5 @@
 import React, { useState, useEffect, createRef } from "react";
+import { Spin } from "antd";
 import {
   CircularProgress,
   Grid,
@@ -14,6 +15,7 @@ import PlaceDetail from "./PlaceDetail";
 import useStyles from "../styles/PlaceListStyle.js";
 
 function PlaceList({
+  isLoading,
   placeArr,
   placeClicked,
   elRefs,
@@ -24,8 +26,8 @@ function PlaceList({
 }) {
   const classes = useStyles();
 
-  return (
-    <>
+  return isLoading ?  <Spin size="large" style={{ margin: "10px" }} /> :(
+    <>  
       <Grid container spacing={3} className={classes.list}>
         {placeArr?.map((place, i) => (
           <Grid key={i} ref={elRefs[i]} item xs={12}>
