@@ -1,6 +1,7 @@
 /*global google*/
 import { Button, Space } from "antd";
 import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import DisplayPlanMap from "./DisplayPlanMap";
 import DisplayPlanTabs from "./DisplayPlanTabs";
@@ -20,26 +21,42 @@ import {
 import Paper from "@mui/material/Paper";
 
 function DisplayPlan(props) {
-  const { state } = props.location;
-  const { trips } = state;
-  // console.log("in display plan");
-  // console.log(trips);
-  // console.log(typeof trips);
-  // console.log(Array.isArray(trips));
-  // console.log(trips[0]);
-  // console.log(typeof trips[0]);
+  const { generatedPlan } = props.location.state;
 
-  // useEffect(() => {
-  //   const tempTrips = JSON.parse(localStorage.getItem("fTrips"));
-  //   if (tempTrips) {
-  //     setGeneratedTrips(tempTrips);
-  //     // setDayTrip(generatedTrips[0]);
-  //   }
-  // }, []);
-  // console.log(typeof generatedTrips);
-  // console.log(generatedTrips.keys());
-  // const tmp = generatedTrips[0];
-  // console.log(dayTrip);
+  const {
+    EndDay,
+    StartDay,
+    SamplePlaceName,
+    Transportation,
+    TripName,
+    places,
+    tripID,
+  } = generatedPlan;
+
+  console.log(places);
+
+  const formatPlaces = (places) => {
+    if (!places || places.length === 0) {
+      return null;
+    }
+
+    const placeArr = places.map((place, i) => {
+      return place.map((p, j) => {
+        return {
+          id: p.id,
+          name: p.DisplayName.text,
+          address: p.formattedAddress,
+          latitude: p.location.latitude,
+          longitude: p.location.longitude,
+        };
+      });
+    });
+    console.log("placeArr", placeArr);
+    return placeArr;
+  };
+
+  // formatPlaces(places);
+  const trips = formatPlaces(places);
 
   const addToSavedPlans = () => {
     console.log("plan added!");
@@ -58,9 +75,9 @@ function DisplayPlan(props) {
     alignItems: "center",
   };
 
-  // const isLoaded = useLoadScript({
-  //   googleMapsApiKey: GOOGLE_MAP_API_KEY,
-  // });
+  const isLoaded = useLoadScript({
+    googleMapsApiKey: GOOGLE_MAP_API_KEY,
+  });
 
   // to set the active tab;
   // const [activeTab, setActiveTab] = useState(0);

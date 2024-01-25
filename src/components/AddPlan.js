@@ -2,20 +2,58 @@
 import axios from "axios";
 
 import React, { useEffect, useState, createRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import DateInput from "./DateInput";
 import PlanMap from "./PlanMap";
 import PlaceList from "./PlaceList";
 import { Grid } from "@material-ui/core";
 import { differenceInDays } from "date-fns";
-import { PLACES, GOOGLE_MAP_API_KEY, BACKEND } from "../constants.js";
+import {
+  PLACES,
+  GOOGLE_MAP_API_KEY,
+  BACKEND,
+  PROXY_URL,
+} from "../constants.js";
 import PlaceMenu from "./PlaceMenu.js";
 
-import { Typography, Divider, message, Input} from "antd";
+import { Typography, Divider, message, Input } from "antd";
 
 function AddPlan() {
   const { Title } = Typography;
-  const { Search } = Input
+
+  // ========== for search
+  const { Search } = Input;
+  const [searchValue, setSearchValue] = useState("");
+
+  // search place
+  const onSearch = async (user_input) => {
+    // Clear the search input
+    setSearchValue("");
+    setPlaceIsLoading(true);
+
+    // get the searched places by calling backend api
+    try {
+      const response = await axios.get(`${BACKEND}/searchPlaces`, {
+        params: {
+          max_num_display: 100,
+          user_input,
+        },
+      });
+      console.log(response.data);
+      formatPlaces(response.data);
+    } catch (error) {
+      console.error(`Error: ${error}`);
+    } finally {
+      setPlaceIsLoading(false);
+    }
+    // update the places to show
+  };
+
+  // reload the default places
+  const handleReload = () => {
+    console.log("reload");
+    formatPlaces(PLACES);
+  };
 
   //========== for date
   const [dateInput, setDateInput] = useState({
@@ -41,8 +79,7 @@ function AddPlan() {
 
   //========== fetch default places
   const [placeArr, setPlaceArr] = useState([]);
-  const [placeIsLoading, setPlaceIsLoading] = useState(false)
-  const [searchValue, setSearchValue] = useState("");
+  const [placeIsLoading, setPlaceIsLoading] = useState(false);
 
   useEffect(() => {
     formatPlaces(PLACES);
@@ -75,31 +112,6 @@ function AddPlan() {
 
   const [placeClicked, setPlaceClicked] = useState();
 
-  const onSearch = async (user_input) => {
-    // Clear the search input
-    setSearchValue("");
-    setPlaceIsLoading(true);
-
-    // get the searched places by calling backend api
-    try {
-        const response = await axios.get(`${BACKEND}/searchPlaces`, {
-            params: {
-                max_num_display: 100,
-                user_input
-            }
-        });
-        console.log(response.data)
-        formatPlaces(response.data)
-        
-      } catch (error) {
-        console.error(`Error: ${error}`);
-        
-      } finally {
-        setPlaceIsLoading(false);
-      }
-    // update the places to show
-
-  }
   // console.log(placeClicked);
 
   const [elRefs, setElRefs] = useState([]);
@@ -147,9 +159,9 @@ function AddPlan() {
     // console.log(trips);
   }
 
-//   console.log("trips in addplan is");
-//   console.log(trips);
-//   console.log(typeof trips);
+  //   console.log("trips in addplan is");
+  //   console.log(trips);
+  //   console.log(typeof trips);
 
   //========== delete places to each day
 
@@ -177,31 +189,81 @@ function AddPlan() {
   // console.log(Array.isArray(trips));
 
   //========== generate trip object
+  // const [generatedPlan, setGeneratedPlan] = useState();
+
+  function formatDate(date) {
+    const dateObj = date;
+    const month = dateObj.getUTCMonth() + 1; // months from 1-12
+    const day = dateObj.getUTCDate();
+    const year = dateObj.getUTCFullYear();
+
+    const pMonth = month.toString().padStart(2, "0");
+    const pDay = day.toString().padStart(2, "0");
+
+    const newDate = `${year}-${pMonth}-${pDay}`;
+    return newDate;
+  }
+
+  const history = useHistory();
 
   function handleConfirmPlaces() {
     // formate trips with original place object
+    const username = "backend_dev_01_14";
+    const StartDay = formatDate(dateInput.startDate);
+    const EndDay = formatDate(dateInput.endDate);
 
-    const tripList = trips.map((trip, i) => {
+    const TripName = username + "_" + StartDay + "_" + EndDay;
+    const places = trips.map((trip, i) => {
       return trip.map((t, j) => {
         return t.original;
       });
     });
 
-    // to generate object
+    const opt = {
+      method: "POST",
+      url: PROXY_URL + BACKEND + "/generateTripPlan",
+      data: {
+        TripName: TripName,
+        username: username,
+        StartDay: StartDay,
+        EndDay: EndDay,
+        Transportation: "driving",
+        places: places,
+      },
+      headers: { "content-type": "application/json" },
+    };
 
-    // for (let i = 0; i < tripList.length; i++) {
-    //   localStorage.setItem(`trips${0}`, JSON.stringify(tripList[0]));
-    // }
-    // localStorage.setItem(`trips`, JSON.stringify(tripList));
+    axios(opt)
+      .then((response) => {
+        if (response.status === 200) {
+          message.success("generate trip and save succeed!");
+          console.log(response.data);
+          // setGeneratedPlan(response.data);
+          const generatedPlan = response.data;
 
-    // localStorage.setItem(`fTrips`, JSON.stringify(tripList));
-    // localStorage.setItem("startDate", JSON.stringify(dateInput.startDate));
-    // localStorage.setItem("endDate", JSON.stringify(dateInput.endDate));
+          // console.log(generatedPlan);
+          history.push("/displayplan", { generatedPlan });
+        }
+      })
+      .catch((error) => {
+        console.log("generate trip and save failed: ", error.message);
+        message.error("generate trip and save failed!");
+      });
   }
+
+  // to generate object
+
+  // for (let i = 0; i < tripList.length; i++) {
+  //   localStorage.setItem(`trips${0}`, JSON.stringify(tripList[0]));
+  // }
+  // localStorage.setItem(`trips`, JSON.stringify(tripList));
+
+  // localStorage.setItem(`fTrips`, JSON.stringify(tripList));
+  // localStorage.setItem("startDate", JSON.stringify(dateInput.startDate));
+  // localStorage.setItem("endDate", JSON.stringify(dateInput.endDate));
 
   return (
     <>
-    
       <Title level={5}>Choose Your Plan Date </Title>
       <DateInput dateInput={dateInput} handleDateChange={handleDateChange}>
         <button
@@ -217,18 +279,46 @@ function AddPlan() {
       </DateInput>
 
       {numOfDays <= 15 && numOfDays > 0 ? (
-        
         <>
           <div>
+            <Title level={5}> Explore New York By Yourself </Title>
+
+            <Grid
+              container
+              spacing={3}
+              style={{ width: "60%" }}
+              direction="row"
+              justifyContent="left"
+              alignItems="flex-start"
+            >
+              <Grid item xs={6} md={4}>
                 <Search
-                placeholder="search for places"
-                // enterButton="Ask"
-                size="large"
-                onSearch={onSearch}
-                // loading={isLoading}
-                value={searchValue} // Control the value
-                onChange={(e)=>{ setSearchValue(e.target.value);}} // Update the value when changed
+                  placeholder="search for places"
+                  style={{
+                    width: 380,
+                  }}
+                  // enterButton="Ask"
+                  size="large"
+                  onSearch={onSearch}
+                  // loading={isLoading}
+                  value={searchValue} // Control the value
+                  onChange={(e) => {
+                    setSearchValue(e.target.value);
+                  }} // Update the value when changed
                 />
+              </Grid>
+              <Grid item xs={6} md={2}>
+                <button
+                  style={{ height: "40px" }}
+                  onClick={() => {
+                    console.log("reload");
+                    handleReload();
+                  }}
+                >
+                  reload default places
+                </button>
+              </Grid>
+            </Grid>
           </div>
 
           <Title level={5}>Choose Your Places You Want To Visit </Title>
@@ -275,21 +365,16 @@ function AddPlan() {
                 <Divider></Divider>
                 <Grid item>
                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  <Link
+                  {/* <Link
                     to={{
                       pathname: "/displayplan",
-                      state: { trips: trips },
+                      state: generatedPlan,
                     }}
-                  >
-                    {" "}
+                  > */}
+                  <button onClick={handleConfirmPlaces}>
                     Confirm to Generate Plan
-                    {/* <button onClick={handleConfirmPlaces}>
-                      Confirm to Generate Plan
-                    </button> */}
-                    {/* <button>
-                      Confirm to Generate Plan
-                    </button> */}
-                  </Link>
+                  </button>
+                  {/* </Link> */}
                 </Grid>
               </Grid>
             )}
