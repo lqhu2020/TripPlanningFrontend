@@ -13,7 +13,7 @@ function Login(props) {
     const { username, password } = values;
     const opt = {
       method: "POST",
-      url: `${BASE_URL}/signin`,
+      url: `${BASE_URL}/login`,
       data: {
         username: username,
         password: password,

@@ -97,7 +97,7 @@ function AddPlan() {
         address: p.formattedAddress,
         latitude: p.location.latitude,
         longitude: p.location.longitude,
-        reviews: p.reviews,
+        // reviews: p.reviews,
         // to add photos
         photoUrl:
           "https://places.googleapis.com/v1/" +

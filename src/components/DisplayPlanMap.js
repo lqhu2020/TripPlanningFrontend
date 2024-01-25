@@ -33,38 +33,27 @@ function DisplayPlanMap({ trip }) {
     map.fitBounds(bounds);
   };
   const [directions, setDirections] = useState();
-  const [waypts, setWaypts] = useState([]);
-  const [startPlace, setStartPlace] = useState();
-  const [endPlace, setEndPlace] = useState();
-  const [tmpTrip, setTmpTrip] = useState(trip);
 
+  const tmpTrip = trip;
   console.log("trip length in display plan map is");
   console.log(tmpTrip.length);
 
   useEffect(() => {
-    setTmpTrip(trip);
+    console.log("effect");
 
-    if (tmpTrip.length >= 2) {
-      // const tmp = tmpTrip.slice(1, -1);
-      console.log("effect");
-      // console.log(typeof trip[0].name);
+    if (tmpTrip.length > 1) {
       const tmp1 = tmpTrip.at(0).name;
       const tmp2 = tmpTrip.at(tmpTrip.length - 1).name;
-      setStartPlace(tmp1);
-      setEndPlace(tmp2);
-
-      console.log(startPlace);
-      console.log(endPlace);
 
       const alist = tmpTrip.map((p, i) => ({ location: p.name })).slice(1, -1);
-      setWaypts(alist);
 
       const service = new google.maps.DirectionsService();
+
       service.route(
         {
-          origin: startPlace,
-          destination: endPlace,
-          waypoints: waypts,
+          origin: tmp1,
+          destination: tmp2,
+          waypoints: alist,
           optimizeWaypoints: true,
           travelMode: "DRIVING",
         },
@@ -79,15 +68,12 @@ function DisplayPlanMap({ trip }) {
         }
       );
     } else {
-      setWaypts([]);
-      setStartPlace();
-      setEndPlace();
       setDirections();
     }
-
-    console.log("waypts");
-    console.log(waypts);
   }, [trip]);
+
+  console.log("directions");
+  console.log(directions);
 
   return (
     <div>
@@ -102,7 +88,10 @@ function DisplayPlanMap({ trip }) {
         >
           {trip.length <= 1 ? (
             trip.map((p, index) => (
-              <Marker position={{ lat: p.latitude, lng: p.longitude }}></Marker>
+              <Marker
+                key={index}
+                position={{ lat: p.latitude, lng: p.longitude }}
+              ></Marker>
             ))
           ) : (
             <DirectionsRenderer directions={directions} />

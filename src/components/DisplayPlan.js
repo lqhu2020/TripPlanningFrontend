@@ -110,7 +110,10 @@ function DisplayPlan(props) {
             <Button>Home</Button>
           </Link>
         </div>
-        <h1>Plan 1</h1>
+        <h1>Your Trip: {TripName}</h1>
+        <h2>
+          From: {StartDay} to {EndDay}
+        </h2>
         <div style={{ display: "flex", width: "100%" }}>
           <DisplayPlanMap trip={tmpTrip}></DisplayPlanMap>
           <div style={{ paddingLeft: "10vw" }}>
@@ -127,11 +130,11 @@ function DisplayPlan(props) {
               <Button onClick={addToSavedPlans}>Edit Plans</Button>
             </Link>
           </span>
-          <span>
+          {/* <span>
             <Button type="primary" onClick={addToSavedPlans}>
               Add To Saved Plans
             </Button>
-          </span>
+          </span> */}
         </Space>
       </div>
     </>
