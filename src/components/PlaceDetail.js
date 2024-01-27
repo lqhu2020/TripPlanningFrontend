@@ -33,6 +33,10 @@ function PlaceDetail({
 
   const closeOverlay = () => {
     setIsOpen(false);
+  };
+
+  const handleConfirmDate = () => {
+    setIsOpen(false);
 
     const dateIndex = differenceInDays(date, dateInput.startDate);
     console.log(place);
@@ -79,11 +83,8 @@ function PlaceDetail({
             maxDate={dateInput.endDate}
           />
           <div>
-            <button
-                onClick={closeOverlay}> ok
-            </button>
+            <button onClick={handleConfirmDate}> Confirm Date</button>
           </div>
-          
         </Overlay>
       </CardActions>
     </Card>

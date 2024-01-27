@@ -60,28 +60,8 @@ function Home(props) {
 
   useEffect(() => {
     fetchTrips(username);
+    // fetchRecommendation();
   }, [username]);
-
-  // const trips = [
-  //   {
-  //     tripID: "fee254fa-4dd6-4538-903c-df50fdb2b814",
-  //     TripName: "postman testing trip",
-  //     StartDay: "2024-01-10",
-  //     EndDay: "2024-01-11",
-  //     Transportation: "driving",
-  //     places: null,
-  //     SamplePlaceName: "Rockefeller Center",
-  //   },
-  //   {
-  //     tripID: "046082d8-ec51-4e58-acf8-ed618f4eb9d1",
-  //     TripName: "postman testing trip",
-  //     StartDay: "2024-01-11",
-  //     EndDay: "2024-01-12",
-  //     Transportation: "driving",
-  //     places: null,
-  //     SamplePlaceName: "Rockefeller Center",
-  //   },
-  // ];
 
   console.log(trips);
 
@@ -111,10 +91,17 @@ function Home(props) {
   //     });
   // }
 
-  function handleAddNewPlan() {}
+  // only for render
+  function DeleteOneTrip(tripID) {
+    let newTrips = [...trips];
+
+    newTrips = newTrips.filter((v, i) => v.tripID != tripID);
+    setTrips(newTrips);
+  }
 
   return (
     <>
+      {/* <button onClick={fetchRecommendation}>Recommendation</button> */}
       <Grid
         container
         spacing={3}
@@ -124,11 +111,10 @@ function Home(props) {
         alignItems="flex-start"
       >
         <Grid item xs={8} md={1}></Grid>
-
         <Grid item xs={8} md={6}>
           <Title level={3}> {"\t\t\t"} Saved Trips </Title>
 
-          <TripList tripArr={trips} />
+          <TripList tripArr={trips} DeleteOneTrip={DeleteOneTrip} />
           <Link to="/addplan">
             <button>Add New Plan</button>
           </Link>

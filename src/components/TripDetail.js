@@ -20,6 +20,7 @@ import {
   BACKEND,
   PROXY_URL,
 } from "../constants.js";
+import { message } from "antd";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -43,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function TripDetail({ trip }) {
+function TripDetail({ trip, DeleteOneTrip }) {
   const [photoUrl, setPhotoUrl] = useState("");
 
   function fetchTripImage(placeName) {
@@ -113,6 +114,45 @@ function TripDetail({ trip }) {
       });
   }
 
+  function deleteTrip(tripID) {
+    const opt = {
+      method: "DELETE",
+      url: PROXY_URL + BACKEND + "/deleteTrip",
+      params: {
+        tripID: tripID,
+      },
+      headers: { "content-type": "application/json" },
+    };
+
+    axios(opt)
+      .then((response) => {
+        if (response.status === 200) {
+          console.log(response);
+          message.success("trip delete succeed!");
+          // setGeneratedPlan(response.data);
+        }
+      })
+      .catch((error) => {
+        console.log("trip delete failed: ", error.message);
+      });
+  }
+
+  const [isOpen, setIsOpen] = useState(false);
+
+  const openOverlay = () => {
+    setIsOpen(true);
+  };
+
+  const closeOverlay = () => {
+    setIsOpen(false);
+  };
+
+  const confirmDelete = (tripID) => {
+    setIsOpen(false);
+    DeleteOneTrip(tripID);
+    deleteTrip(tripID);
+  };
+
   return (
     <Card className={classes.root}>
       <CardMedia
@@ -133,7 +173,15 @@ function TripDetail({ trip }) {
         <CardActions>
           <button onClick={handleCheckTrip}>Check Trip</button>
 
-          <button>Delete Trip</button>
+          <button onClick={openOverlay}>Delete Trip</button>
+          <Overlay isOpen={isOpen} onClose={closeOverlay}>
+            <div>
+              <button onClick={() => confirmDelete(trip.tripID)}>
+                {" "}
+                Confirm Delete
+              </button>
+            </div>
+          </Overlay>
         </CardActions>
         <div className={classes.controls}></div>
       </div>

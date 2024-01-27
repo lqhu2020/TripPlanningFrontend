@@ -14,15 +14,15 @@ import { PLACES, GOOGLE_MAP_API_KEY } from "../constants.js";
 import TripDetail from "./TripDetail.js";
 import useStyles from "../styles/TripListStyle.js";
 
-function TripList({ tripArr }) {
+function TripList({ tripArr, DeleteOneTrip }) {
   const classes = useStyles();
 
   return (
     <>
       <Grid container spacing={3} className={classes.list}>
         {tripArr?.map((trip, i) => (
-          <Grid key={i} item xs={12}>
-            <TripDetail trip={trip} />
+          <Grid item xs={12}>
+            <TripDetail trip={trip} DeleteOneTrip={DeleteOneTrip} />
           </Grid>
         ))}
       </Grid>
