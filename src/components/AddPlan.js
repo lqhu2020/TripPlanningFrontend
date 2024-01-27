@@ -208,7 +208,7 @@ function AddPlan() {
 
   function handleConfirmPlaces() {
     // formate trips with original place object
-    const username = "backend_dev_01_14";
+    const username = "tester123";
     const StartDay = formatDate(dateInput.startDate);
     const EndDay = formatDate(dateInput.endDate);
 

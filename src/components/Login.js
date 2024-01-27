@@ -4,7 +4,7 @@ import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
-import { BASE_URL } from "../constants";
+import { BASE_URL, PROXY_URL } from "../constants";
 
 function Login(props) {
   const { handleLoggedIn } = props;
@@ -13,7 +13,7 @@ function Login(props) {
     const { username, password } = values;
     const opt = {
       method: "POST",
-      url: `${BASE_URL}/login`,
+      url: `${PROXY_URL}${BASE_URL}/login`,
       data: {
         username: username,
         password: password,

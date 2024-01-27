@@ -1,119 +1,141 @@
 import React, { useState, useEffect } from "react";
-import { Tabs } from "antd";
+import { Button, Space, Tabs } from "antd";
 import axios from "axios";
 
 import SearchBar from "./SearchBar";
 import CreatePlanButton from "./CreatePlanButton";
 // import PhotoGallery from "./PhotoGallery";
 import PlanGallery from "./PlanGallery";
-import { UNSPLASH_ROOT, UNSPLASH_KEY } from "../constants";
+import {
+  PLACES,
+  GOOGLE_MAP_API_KEY,
+  BACKEND,
+  PROXY_URL,
+  BASE_URL,
+} from "../constants.js";
+import { Link } from "react-router-dom";
+import TripList from "./TripList";
+
+import {
+  CircularProgress,
+  Grid,
+  InputLabel,
+  MenuItem,
+  FormControl,
+  Select,
+} from "@material-ui/core";
+import { Typography } from "antd";
+const { Title } = Typography;
 const { TabPane } = Tabs;
 
 function Home(props) {
-  const [plans, setPlans] = useState([]);
-  const [images, setImages] = useState([]);
-  const [activeTab, setActiveTab] = useState("your_plans");
+  const [trips, setTrips] = useState([]);
+  const [tripsIsLoading, setTripIsLoading] = useState(false);
 
-  const handleSearch = (option) => {};
+  const [images, setImages] = useState([]);
+
+  const username = "user_signup_uuidtestxwd";
+  // const username = "tester1";
+  function fetchTrips(username) {
+    setTripIsLoading(true);
+
+    const opt = {
+      method: "GET",
+      url: `${BASE_URL}/getAllPlansOfUser`,
+      params: {
+        username: username,
+      },
+      headers: { "Content-Type": "application/json" },
+    };
+    axios(opt)
+      .then((res) => {
+        if (res.status === 200) {
+          setTrips(res.data);
+        }
+      })
+      .catch((err) => {
+        console.log("fetch failed: ", err.message);
+      });
+  }
 
   useEffect(() => {
-    fetchPlans();
-  }, [activeTab]);
+    fetchTrips(username);
+  }, [username]);
 
-  const fetchPlanImage = async (planStates) => {
-    console.log(planStates);
-    let urls = planStates.map((plan) => {
-      return `${UNSPLASH_ROOT}/search/photos?query=${plan.place}&client_id=${UNSPLASH_KEY}&per_page=1`;
-    });
+  // const trips = [
+  //   {
+  //     tripID: "fee254fa-4dd6-4538-903c-df50fdb2b814",
+  //     TripName: "postman testing trip",
+  //     StartDay: "2024-01-10",
+  //     EndDay: "2024-01-11",
+  //     Transportation: "driving",
+  //     places: null,
+  //     SamplePlaceName: "Rockefeller Center",
+  //   },
+  //   {
+  //     tripID: "046082d8-ec51-4e58-acf8-ed618f4eb9d1",
+  //     TripName: "postman testing trip",
+  //     StartDay: "2024-01-11",
+  //     EndDay: "2024-01-12",
+  //     Transportation: "driving",
+  //     places: null,
+  //     SamplePlaceName: "Rockefeller Center",
+  //   },
+  // ];
 
-    const requests = urls.map((url) => axios.get(url));
-    axios.all(requests).then((responses) => {
-      const images = responses.map((resp, index) => {
-        const { data } = resp;
-        // console.log(data);
-        const image = data.results[0];
-        // console.log("image", image);
-        return {
-          planId: planStates[index].planId,
-          user: "test",
-          caption: planStates[index].place,
-          src: image.urls.thumb,
-          thumbnail: image.urls.thumb,
-          // thumbnailWidth: 300,
-          // thumbnailHeight: 200,
-          // width: 300,
-          // height: 200,
-        };
-      });
-      setImages(images);
-      console.log(images);
-    });
-  };
+  console.log(trips);
 
-  const fetchPlans = () => {
-    if (activeTab === "your_plans") {
-      console.log("enter your plans");
-      setPlans([
-        { planId: "0", place: "Beijing" },
-        { planId: "2", place: "London" },
-        { planId: "4", place: "Memphis" },
-      ]);
-      setPlans((state) => {
-        fetchPlanImage(state);
-        console.log(images);
-        // fetchPlanImageLocal(state);
-        return state;
-      });
-    } else if (activeTab === "recommended_plans") {
-      console.log("enter recommended plans");
-      setPlans([
-        { planId: "1", place: "Shanghai" },
-        { planId: "3", place: "Paris" },
-        { planId: "5", place: "Kyoto" },
-      ]);
-      setPlans((state) => {
-        // console.log(state);
-        fetchPlanImage(state);
-        return state;
-      });
-    }
-  };
+  // function fetchRecommendation() {
+  //   const opt = {
+  //     method: "GET",
+  //     url: PROXY_URL + BACKEND + "/recommendation",
+  //     data: {
+  //       City: "New York",
+  //       StartDay: "2024-01-25",
+  //       EndDay: "2024-01-30",
+  //     },
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //       Authorization:
+  //         "Bearer " + "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",
+  //     },
+  //   };
+  //   axios(opt)
+  //     .then((res) => {
+  //       if (res.status === 200) {
+  //         console.log(res);
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       console.log("fetch failed: ", err.message);
+  //     });
+  // }
 
-  const renderPlans = () => {
-    if (!plans || plans.length === 0 || images.length === 0) {
-      return <div>No data!</div>;
-    } else {
-      console.log("home", images);
-      return <PlanGallery images={images} plans={plans}></PlanGallery>;
-    }
-  };
-
-  const showPlans = (type) => {
-    console.log("type -> ", type);
-    setActiveTab(type);
-  };
-
-  const operations = <CreatePlanButton onShowPost={showPlans} />;
+  function handleAddNewPlan() {}
 
   return (
-    <div className="home">
-      <SearchBar handleSearch={handleSearch} />
-      <div className="display">
-        <Tabs
-          onChange={(key) => setActiveTab(key)}
-          defaultActiveKey="your_plans"
-          activeKey={activeTab}
-          tabBarExtraContent={operations}
-        >
-          <TabPane tab="Your Plans" key="your_plans">
-            {renderPlans()}
-          </TabPane>
-          <TabPane tab="Recommended Plans" key="recommended_plans">
-            {renderPlans()}
-          </TabPane>
-        </Tabs>
-      </div>
-    </div>
+    <>
+      <Grid
+        container
+        spacing={3}
+        style={{ width: "80%" }}
+        direction="row"
+        justifyContent="center"
+        alignItems="flex-start"
+      >
+        <Grid item xs={8} md={1}></Grid>
+
+        <Grid item xs={8} md={6}>
+          <Title level={3}> {"\t\t\t"} Saved Trips </Title>
+
+          <TripList tripArr={trips} />
+          <Link to="/addplan">
+            <button>Add New Plan</button>
+          </Link>
+        </Grid>
+        <Grid item xs={8} md={1}></Grid>
+      </Grid>
+    </>
   );
 }
 
