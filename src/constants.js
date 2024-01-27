@@ -1,7 +1,6 @@
 export const TOKEN_KEY = "token";
-// export const BASE_URL =
-//   "https://cors-anywhere.herokuapp.com/http://34.82.85.194:8080";
-// export const BASE_URL = "http://34.82.85.194:8080";
+export const USER_NAME = "user_name";
+
 export const BASE_URL = "http://34.82.85.194:8080";
 
 export const GOOGLE_MAP_API_KEY = "";

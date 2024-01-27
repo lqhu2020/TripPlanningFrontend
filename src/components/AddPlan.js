@@ -13,12 +13,15 @@ import {
   GOOGLE_MAP_API_KEY,
   BACKEND,
   PROXY_URL,
+  USER_NAME,
 } from "../constants.js";
 import PlaceMenu from "./PlaceMenu.js";
 
 import { Typography, Divider, message, Input } from "antd";
 
 function AddPlan() {
+  const username = localStorage.getItem(USER_NAME);
+
   const { Title } = Typography;
 
   // ========== for search
@@ -97,7 +100,7 @@ function AddPlan() {
         address: p.formattedAddress,
         latitude: p.location.latitude,
         longitude: p.location.longitude,
-        // reviews: p.reviews,
+        //reviews: p.reviews,
         // to add photos
         photoUrl:
           "https://places.googleapis.com/v1/" +
@@ -208,11 +211,11 @@ function AddPlan() {
 
   function handleConfirmPlaces() {
     // formate trips with original place object
-    const username = "tester123";
+
     const StartDay = formatDate(dateInput.startDate);
     const EndDay = formatDate(dateInput.endDate);
 
-    const TripName = username + "_" + StartDay + "_" + EndDay;
+    const TripName = "Trip_New_York_" + "_" + StartDay + "_" + EndDay;
     const places = trips.map((trip, i) => {
       return trip.map((t, j) => {
         return t.original;
@@ -262,7 +265,9 @@ function AddPlan() {
   // localStorage.setItem("startDate", JSON.stringify(dateInput.startDate));
   // localStorage.setItem("endDate", JSON.stringify(dateInput.endDate));
 
-  return (
+  return username === null ? (
+    <Title level={5}> Please log in first ! </Title>
+  ) : (
     <>
       <Title level={5}>Choose Your Plan Date </Title>
       <DateInput dateInput={dateInput} handleDateChange={handleDateChange}>

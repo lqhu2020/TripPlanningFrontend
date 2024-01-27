@@ -12,6 +12,7 @@ import {
   BACKEND,
   PROXY_URL,
   BASE_URL,
+  USER_NAME,
 } from "../constants.js";
 import { Link } from "react-router-dom";
 import TripList from "./TripList";
@@ -30,15 +31,10 @@ const { TabPane } = Tabs;
 
 function Home(props) {
   const [trips, setTrips] = useState([]);
-  const [tripsIsLoading, setTripIsLoading] = useState(false);
 
-  const [images, setImages] = useState([]);
+  const username = localStorage.getItem(USER_NAME);
 
-  const username = "user_signup_uuidtestxwd";
-  // const username = "tester1";
   function fetchTrips(username) {
-    setTripIsLoading(true);
-
     const opt = {
       method: "GET",
       url: `${BASE_URL}/getAllPlansOfUser`,

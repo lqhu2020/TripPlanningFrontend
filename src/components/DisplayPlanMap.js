@@ -8,7 +8,7 @@ import {
 } from "@react-google-maps/api";
 import { CENTER_CITY } from "../constants";
 import { GOOGLE_MAP_API_KEY } from "../constants";
-import { Button } from "antd";
+import { Button, message } from "antd";
 
 // const google = window.google;
 
@@ -64,6 +64,7 @@ function DisplayPlanMap({ trip }) {
             console.log(result);
           } else {
             console.error(`error fetching directions ${result}`);
+            message.error("hard to find a proper plan for these places !");
           }
         }
       );

@@ -24,7 +24,7 @@ function Login(props) {
       .then((res) => {
         if (res.status === 200) {
           const { data } = res;
-          handleLoggedIn(data);
+          handleLoggedIn(data, username);
           message.success("Login succeed! ");
         }
       })

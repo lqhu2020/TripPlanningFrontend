@@ -21,8 +21,12 @@ function TripList({ tripArr, DeleteOneTrip }) {
     <>
       <Grid container spacing={3} className={classes.list}>
         {tripArr?.map((trip, i) => (
-          <Grid item xs={12}>
-            <TripDetail trip={trip} DeleteOneTrip={DeleteOneTrip} />
+          <Grid item key={trip.tripID} xs={12}>
+            <TripDetail
+              key={trip.tripID}
+              trip={trip}
+              DeleteOneTrip={DeleteOneTrip}
+            />
           </Grid>
         ))}
       </Grid>

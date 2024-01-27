@@ -47,40 +47,40 @@ const useStyles = makeStyles((theme) => ({
 function TripDetail({ trip, DeleteOneTrip }) {
   const [photoUrl, setPhotoUrl] = useState("");
 
-  function fetchTripImage(placeName) {
-    const opt = {
-      method: "GET",
-      url: PROXY_URL + BACKEND + "/searchPlaces",
-      params: {
-        max_num_display: 1,
-        user_input: placeName,
-      },
-      headers: { "content-type": "application/json" },
-    };
+  // function fetchTripImage(placeName) {
+  //   const opt = {
+  //     method: "GET",
+  //     url: PROXY_URL + BACKEND + "/searchPlaces",
+  //     params: {
+  //       max_num_display: 1,
+  //       user_input: placeName,
+  //     },
+  //     headers: { "content-type": "application/json" },
+  //   };
 
-    axios(opt)
-      .then((response) => {
-        if (response.status === 200) {
-          //   message.success("generate trip and save succeed!");
-          console.log(response.data);
+  //   axios(opt)
+  //     .then((response) => {
+  //       if (response.status === 200) {
+  //         //   message.success("generate trip and save succeed!");
+  //         console.log(response.data);
 
-          const place = response.data[0].photos[0].name;
-          const Url =
-            "https://places.googleapis.com/v1/" +
-            place +
-            "/media?maxHeightPx=400&maxWidthPx=400&key=" +
-            GOOGLE_MAP_API_KEY;
-          setPhotoUrl(Url);
-        }
-      })
-      .catch((error) => {
-        console.log(": ", error.message);
-      });
-  }
+  //         const place = response.data[0].photos[0].name;
+  //         const Url =
+  //           "https://places.googleapis.com/v1/" +
+  //           place +
+  //           "/media?maxHeightPx=400&maxWidthPx=400&key=" +
+  //           GOOGLE_MAP_API_KEY;
+  //         setPhotoUrl(Url);
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.log(": ", error.message);
+  //     });
+  // }
 
-  useEffect(() => {
-    fetchTripImage(trip.SamplePlaceName);
-  }, [trip]);
+  // useEffect(() => {
+  //   fetchTripImage(trip.SamplePlaceName);
+  // }, [trip]);
 
   const classes = useStyles();
   const theme = useTheme();
@@ -155,11 +155,11 @@ function TripDetail({ trip, DeleteOneTrip }) {
 
   return (
     <Card className={classes.root}>
-      <CardMedia
+      {/* <CardMedia
         className={classes.cover}
         image={photoUrl}
         title="Live from space album cover"
-      />
+      /> */}
       <div className={classes.details}>
         <CardContent className={classes.content}>
           <Typography component="h5" variant="h5">
