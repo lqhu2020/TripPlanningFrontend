@@ -17,9 +17,15 @@ import {
 } from "../constants.js";
 import PlaceMenu from "./PlaceMenu.js";
 
-import { Typography, Divider, message, Input } from "antd";
+import { Typography, Divider, message, Input, Button } from "antd";
 
 function ModifyPlan(props) {
+  const homeButtonStyle = {
+    position: "absolute",
+    right: "0",
+    padding: "40px",
+  };
+
   const { generatedPlan } = props.location.state;
   console.log(generatedPlan);
 
@@ -283,6 +289,11 @@ function ModifyPlan(props) {
     <Title level={5}> Please log in first ! </Title>
   ) : (
     <>
+      <div style={homeButtonStyle}>
+        <Link to="/Home">
+          <Button>Home</Button>
+        </Link>
+      </div>
       <Title level={5}>Choose Your Plan Date </Title>
       <DateInput
         dateInput={dateInput}
