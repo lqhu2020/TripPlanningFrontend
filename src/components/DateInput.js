@@ -6,7 +6,7 @@ import { Space, message } from "antd";
 
 const today = new Date();
 
-function DateInput({ dateInput, handleDateChange, children }) {
+function DateInput({ dateInput, handleDateChange, children, minDate }) {
   return (
     <div>
       <Space direction="horizontal" size={12}>
@@ -16,7 +16,7 @@ function DateInput({ dateInput, handleDateChange, children }) {
           selected={dateInput.startDate}
           onChange={(date) => handleDateChange("startDate", date)}
           startDate={dateInput.startDate}
-          minDate={today}
+          minDate={minDate === null ? today : minDate}
         />
         End Date
         <DatePicker
@@ -25,7 +25,7 @@ function DateInput({ dateInput, handleDateChange, children }) {
           onChange={(date) => handleDateChange("endDate", date)}
           endDate={dateInput.endDate}
           startDate={dateInput.startDate}
-          minDate={today}
+          minDate={minDate === null ? today : minDate}
         />
         {children}
       </Space>

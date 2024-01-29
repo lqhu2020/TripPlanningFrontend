@@ -8,6 +8,7 @@ import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import { Typography } from "antd";
 function PlaceMenu({ trips, deleteOnePlace, openList, handleClick }) {
+  console.log("tripsin place menu", trips);
   const { Title } = Typography;
   return (
     <>
@@ -28,7 +29,9 @@ function PlaceMenu({ trips, deleteOnePlace, openList, handleClick }) {
               }}
               key={i}
             >
-              <ListItemText primary={`Day ${i + 1} (click to select this day)`} />
+              <ListItemText
+                primary={`Day ${i + 1} (click to select this day)`}
+              />
               {openList[i] ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
             <Collapse in={openList[i]} timeout="auto" unmountOnExit>

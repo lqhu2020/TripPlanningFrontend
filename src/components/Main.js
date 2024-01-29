@@ -6,6 +6,7 @@ import Register from "./Register";
 import Home from "./Home";
 import AddPlan from "./AddPlan";
 import DisplayPlan from "./DisplayPlan";
+import ModifyPlan from "./ModifyPlan";
 
 // main is use to direct different web pages
 function Main({ isLoggedIn, handleLoggedIn }) {
@@ -30,6 +31,7 @@ function Main({ isLoggedIn, handleLoggedIn }) {
         <Route path="/home" render={showHome} />
         <Route path="/addplan" component={AddPlan} />
         <Route path="/displayplan" component={DisplayPlan} />
+        <Route path="/modifyplan" component={ModifyPlan} />
       </Switch>
     </div>
   );

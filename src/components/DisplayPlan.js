@@ -1,7 +1,7 @@
 /*global google*/
 import { Button, Space } from "antd";
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import { Link } from "react-router-dom";
 import DisplayPlanMap from "./DisplayPlanMap";
 import DisplayPlanTabs from "./DisplayPlanTabs";
@@ -102,6 +102,11 @@ function DisplayPlan(props) {
   console.log("tab Value");
   console.log(tabKey);
 
+  const history = useHistory();
+  function handleModifyPlan() {
+    history.push("/modifyplan", { generatedPlan });
+  }
+
   return (
     <>
       <div style={{ padding: "20px" }}>
@@ -126,15 +131,8 @@ function DisplayPlan(props) {
         </div>
         <Space style={editButtonStyle}>
           <span>
-            <Link to="/AddPlan">
-              <Button onClick={addToSavedPlans}>Edit Plans</Button>
-            </Link>
+            <Button onClick={handleModifyPlan}>Modify Plan</Button>
           </span>
-          {/* <span>
-            <Button type="primary" onClick={addToSavedPlans}>
-              Add To Saved Plans
-            </Button>
-          </span> */}
         </Space>
       </div>
     </>

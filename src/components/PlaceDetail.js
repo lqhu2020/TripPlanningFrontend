@@ -38,9 +38,12 @@ function PlaceDetail({
   const handleConfirmDate = () => {
     setIsOpen(false);
 
-    const dateIndex = differenceInDays(date, dateInput.startDate);
-    console.log(place);
-    console.log(dateIndex);
+    let dateIndex = date.getDate() - dateInput.startDate.getDate();
+
+    // console.log("date is:", date);
+    // console.log("start date is:", dateInput.startDate);
+    // console.log("date index:", dateIndex);
+
     addOnePlace(dateIndex, place);
     setDate(null);
   };

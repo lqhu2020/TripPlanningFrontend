@@ -19,9 +19,14 @@ import PlaceMenu from "./PlaceMenu.js";
 
 import { Typography, Divider, message, Input } from "antd";
 
-function AddPlan() {
-  const username = localStorage.getItem(USER_NAME);
+function ModifyPlan(props) {
+  const { generatedPlan } = props.location.state;
+  console.log(generatedPlan);
 
+  const { EndDay, StartDay, Transportation, TripName, places, tripID } =
+    generatedPlan;
+
+  const username = localStorage.getItem(USER_NAME);
   const { Title } = Typography;
 
   // ========== for search
@@ -58,12 +63,13 @@ function AddPlan() {
     formatPlaces(PLACES);
   };
 
-  //========== for date
   const [dateInput, setDateInput] = useState({
-    startDate: null,
-    endDate: null,
+    startDate: new Date(StartDay),
+    endDate: new Date(EndDay),
   });
-  const [numOfDays, setNumOfDays] = useState(0);
+
+  const days = differenceInDays(dateInput.endDate, dateInput.startDate);
+  const [numOfDays, setNumOfDays] = useState(days + 1);
 
   function handleDateChange(dateIdentifier, newDate) {
     setDateInput((prevDate) => {
@@ -74,15 +80,42 @@ function AddPlan() {
     });
   }
 
-  const days = differenceInDays(dateInput.endDate, dateInput.startDate);
-  if (days >= 14) {
-    message.warning("no more than 15 days");
-  }
+  console.log(dateInput);
   console.log(numOfDays);
 
-  //========== fetch default places
+  //========== fetch default places and trips
   const [placeArr, setPlaceArr] = useState([]);
   const [placeIsLoading, setPlaceIsLoading] = useState(false);
+
+  // useEffect(() => {
+  //   formatTrips(trips);
+  // }, [places]);
+
+  const formatTrips = (trips) => {
+    const tripsArr = trips.map((trip) => {
+      return trip.map((p) => {
+        return {
+          id: p.id,
+          name: p.DisplayName.text,
+          address: p.formattedAddress,
+          latitude: p.location.latitude,
+          longitude: p.location.longitude,
+          //reviews: p.reviews,
+          // to add photos
+          photoUrl:
+            "https://places.googleapis.com/v1/" +
+            p.photos[0].name +
+            "/media?maxHeightPx=400&maxWidthPx=400&key=" +
+            GOOGLE_MAP_API_KEY,
+          original: p,
+        };
+      });
+    });
+
+    return tripsArr;
+  };
+
+  const [trips, setTrips] = useState(formatTrips(places));
 
   useEffect(() => {
     formatPlaces(PLACES);
@@ -113,9 +146,27 @@ function AddPlan() {
     setPlaceArr(placeArr);
   };
 
-  const [placeClicked, setPlaceClicked] = useState();
+  function handleNumOfDaysChange(newDays) {
+    const preDays = numOfDays;
+    setNumOfDays(newDays);
 
-  // console.log(placeClicked);
+    if (newDays < preDays) {
+      const newTrips = trips.slice(0, newDays);
+      setTrips(newTrips);
+      setNumOfDays(newDays);
+    } else if (newDays > preDays) {
+      const newTrips = trips;
+      for (let i = 0; i < newDays - preDays; i++) {
+        newTrips.push(new Array(0));
+      }
+      setTrips(newTrips);
+      setNumOfDays(newDays);
+    }
+  }
+  console.log("numOfDays", numOfDays);
+
+  console.log("placeArr", placeArr);
+  const [placeClicked, setPlaceClicked] = useState();
 
   const [elRefs, setElRefs] = useState([]);
   useEffect(() => {
@@ -125,25 +176,6 @@ function AddPlan() {
         .map((_, i) => refs[i] || createRef())
     );
   }, [placeArr]);
-
-  //========== add places to each day
-
-  const [trips, setTrips] = useState(new Array(0));
-
-  function initializeTrips() {
-    setTrips(new Array(0));
-    for (let i = 0; i < numOfDays; i++) {
-      setTrips((trips) => [...trips, new Array(0)]);
-    }
-    // console.log(typeof trips);
-    // console.log(Array.isArray(trips));
-  }
-
-  useEffect(() => {
-    if (numOfDays > 0) {
-      initializeTrips();
-    }
-  }, [numOfDays]);
 
   function addOnePlace(idx, pname) {
     let newTrips = [...trips];
@@ -162,12 +194,6 @@ function AddPlan() {
     // console.log(trips);
   }
 
-  //   console.log("trips in addplan is");
-  //   console.log(trips);
-  //   console.log(typeof trips);
-
-  //========== delete places to each day
-
   const [openList, setOpenList] = useState([]);
   const num = trips.length;
 
@@ -185,14 +211,6 @@ function AddPlan() {
     // console.log("a");
     setOpenList(temp);
   }
-
-  // console.log("openlist:");
-  // console.log(openList);
-  // console.log(typeof trips);
-  // console.log(Array.isArray(trips));
-
-  //========== generate trip object
-  // const [generatedPlan, setGeneratedPlan] = useState();
 
   function formatDate(date) {
     const dateObj = date;
@@ -222,16 +240,23 @@ function AddPlan() {
       });
     });
 
+    console.log("trips in confirm modify: ", trips);
+    console.log("places in confirm modify: ", places);
+
     const opt = {
       method: "POST",
-      url: PROXY_URL + BACKEND + "/generateTripPlan",
+      url: PROXY_URL + BACKEND + "/modifyTrip",
       data: {
+        tripID: tripID,
         TripName: TripName,
-        username: username,
+        // username: username,
         StartDay: StartDay,
         EndDay: EndDay,
         Transportation: "driving",
         places: places,
+      },
+      params: {
+        username: username,
       },
       headers: { "content-type": "application/json" },
     };
@@ -239,31 +264,20 @@ function AddPlan() {
     axios(opt)
       .then((response) => {
         if (response.status === 200) {
-          message.success("generate trip and save succeed!");
+          message.success("modify trip and save succeed!");
           console.log(response.data);
           // setGeneratedPlan(response.data);
-          const generatedPlan = response.data;
+          // const generatedPlan = response.data;
 
           // console.log(generatedPlan);
-          history.push("/displayplan", { generatedPlan });
+          history.push("/home");
         }
       })
       .catch((error) => {
-        console.log("generate trip and save failed: ", error.message);
-        message.error("generate trip and save failed!");
+        console.log("modify trip failed: ", error.message);
+        message.error("modify trip failed!");
       });
   }
-
-  // to generate object
-
-  // for (let i = 0; i < tripList.length; i++) {
-  //   localStorage.setItem(`trips${0}`, JSON.stringify(tripList[0]));
-  // }
-  // localStorage.setItem(`trips`, JSON.stringify(tripList));
-
-  // localStorage.setItem(`fTrips`, JSON.stringify(tripList));
-  // localStorage.setItem("startDate", JSON.stringify(dateInput.startDate));
-  // localStorage.setItem("endDate", JSON.stringify(dateInput.endDate));
 
   return username === null ? (
     <Title level={5}> Please log in first ! </Title>
@@ -273,16 +287,19 @@ function AddPlan() {
       <DateInput
         dateInput={dateInput}
         handleDateChange={handleDateChange}
-        minDate={null}
+        minDate={
+          dateInput.startDate < new Date() ? dateInput.startDate : new Date()
+        }
       >
         <button
           disabled={days >= 14 || !dateInput.endDate}
           onClick={() => {
-            setNumOfDays(days + 1);
+            //setNumOfDays(days + 1);
+            handleNumOfDaysChange(days + 1);
             message.success("Dates are confirmed! Explore New Your City");
           }}
         >
-          Confirm Dates
+          Change Dates
         </button>
         <Divider></Divider>
       </DateInput>
@@ -353,6 +370,7 @@ function AddPlan() {
                 addOnePlace={addOnePlace}
               />
             </Grid>
+
             {Array.isArray(trips) && (
               <Grid
                 container
@@ -381,7 +399,7 @@ function AddPlan() {
                     }}
                   > */}
                   <button onClick={handleConfirmPlaces}>
-                    Confirm to Generate Plan
+                    Confirm to Modify Plan
                   </button>
                   {/* </Link> */}
                 </Grid>
@@ -394,4 +412,4 @@ function AddPlan() {
   );
 }
 
-export default AddPlan;
+export default ModifyPlan;

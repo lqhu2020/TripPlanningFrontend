@@ -76,6 +76,7 @@ function DisplayPlanMap({ trip }) {
   console.log("directions");
   console.log(directions);
 
+  console.log("trip", trip);
   return (
     <div>
       {!isLoaded ? (

@@ -25,9 +25,12 @@ function PlaceList({
   addOnePlace,
 }) {
   const classes = useStyles();
+  console.log("numOfDays in placelist: ", numOfDays);
 
-  return isLoading ?  <Spin size="large" style={{ margin: "10px" }} /> :(
-    <>  
+  return isLoading ? (
+    <Spin size="large" style={{ margin: "10px" }} />
+  ) : (
+    <>
       <Grid container spacing={3} className={classes.list}>
         {placeArr?.map((place, i) => (
           <Grid key={i} ref={elRefs[i]} item xs={12}>
